@@ -11,7 +11,7 @@ class Config:
     def read_files(self,config_path: str) -> None:
         for filename in glob.iglob(config_path + '**/*.yaml', recursive=True):
             (type, object) = (filename.split('/')[-2],filename.split('/')[-1].split('.')[0])
-            with initialize(version_base=None, config_path=f"../{config_path.split('/')[-2]}/{config_path.split('/')[-1]}"):
+            with initialize(version_base=None, config_path=f"../{filename.split('/')[-3]}/{filename.split('/')[-2]}"):
                 if not type in self.__config:
                     self.__config[type] = {} 
                 if not object in self.__config[type]:
