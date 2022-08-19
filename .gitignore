@@ -1,0 +1,4 @@
+**/*.yaml
+**/venv
+**/nogit
+**/__pycache__
