@@ -1,10 +1,29 @@
-from errors import *
+from libraries.errors import *
 from hydra import compose, initialize
 import glob
 class Config:
     '''
     Used to read a directory with yaml config files and return all information
     in a dictionary.
+    Example:
+    /etc/config/global/global_config.yaml
+    /etc/config/mailbox/001.yaml
+    /etc/config/mailbox/002.yaml
+
+    This class will generate a dict with the following format when you point it
+    to /etc/config:
+    {'global':
+        {'global_config':
+            {yaml-data...},
+        },
+    mailbox:
+        {'001':
+            {yaml-data...},
+        },
+        {'002':
+            {yaml-data...},
+        }
+    }
     Attributes:
         - data: dictionary to be returned with all 
     Methods:
@@ -26,7 +45,7 @@ class Config:
         This method reads all yaml files in the given directory and build a 
         dictionary with all information inside the yaml files.
         Args:
-            config_path: path where files will be read.
+            config_path: absolute path where files will be read.
         Returns:
             None
         Raises:
