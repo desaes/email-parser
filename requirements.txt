@@ -1,0 +1,15 @@
+antlr4-python3-runtime==4.9.3
+docutils==0.19
+hydra-core==1.2.0
+importlib-resources==5.9.0
+lockfile==0.12.2
+mypy==0.971
+mypy-extensions==0.4.3
+omegaconf==2.2.3
+packaging==21.3
+pyparsing==3.0.9
+python-daemon==2.3.1
+PyYAML==6.0
+tomli==2.0.1
+typing-extensions==4.3.0
+zipp==3.8.1
