@@ -1,6 +1,7 @@
 import imaplib
 import email
-import chardet
+import email.policy
+from logging.config import dictConfig
 import libraries.logger
 import libraries.util
 
@@ -36,7 +37,7 @@ def unpack_email(msgs):
     return result        
 
 class Mailbox:
-    def __init__(self, id: int, config) -> None:
+    def __init__(self, id: int, config:dict) -> None:
         self.id = id
         self.config = config
         self.imap = imaplib.IMAP4(self.config['Mailbox']['ImapHost'])
@@ -51,7 +52,10 @@ class Mailbox:
             else:
                 libraries.logger.custom_log(f"Successfully autheticated: {self.config['Mailbox']['ImapUser']}", 'green')
 
-    def read_email(self, move=False) -> None:
+    def move_email(self, id: int) -> None:
+        pass
+
+    def read_email(self, move=False) -> str:
         result, data = self.imap.select(self.config['Mailbox']['ImapInputMbox'])
         if result != 'OK':
             raise Exception(f"Error opening folder {self.config['Mailbox']['ImapInputMbox']}")
@@ -65,18 +69,24 @@ class Mailbox:
             result, data = self.imap.fetch(num, '(RFC822)')
             if result != 'OK':
                 raise Exception(f"Error reading message: {num}")
-            msgs = email.message_from_string(data[0][1].decode('utf-8'))
-            #custom_log(msgs, 'blue')
-            for msg in unpack_email(msgs):
-                libraries.logger.custom_log(f'Content_type: {msg.get_content_maintype()}', 'cyan')
-                if msg.get_content_maintype() == 'multipart':
+            msgs = email.message_from_bytes(data[0][1], policy=email.policy.default)
+            #libraries.logger.custom_log(type(msgs), 'blue')
+            #for msg in unpack_email(msgs):
+            for part in msgs.walk():
+                #libraries.logger.custom_log(f'Content_type: {part.get_content_maintype()}', 'cyan')
+                if part.get_content_maintype() == 'multipart':
                         continue                
-                for k, v in msg.items():
-                    libraries.logger.custom_log(f'======> Key: {k}', 'red')
-                    libraries.logger.custom_log(f'======> Value: {v}', 'yellow')
+                #for k, v in msgs.items():
+                    #libraries.logger.custom_log(f'======> Key: {k}', 'red')
+                    #libraries.logger.custom_log(f'======> Value: {v}', 'yellow')
+                if part.get_content_maintype() == 'text':
+                    charset = part.get_content_charset()
+                    if part.get_content_type() == "text/plain":
+                        msg_payload = part.get_payload(decode=True)
+                        if msg_payload:
+                            if charset:
+                                yield num.decode(), msgs, msg_payload.decode(charset)
+                            else:
+                                yield num.decode(), msgs, msg_payload.decode()
 
-                if msg.get_content_maintype() == 'text':
-                    libraries.logger.custom_log(f'======> Body:', 'green')
-                    data = libraries.util.decode_str(msg.get_payload())
-                    print(data)
 
