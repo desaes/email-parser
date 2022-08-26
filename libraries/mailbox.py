@@ -5,37 +5,6 @@ from logging.config import dictConfig
 import libraries.logger
 import libraries.util
 
-def filter_builder(params):
-    """
-    Build a text filter based on configuration filter
-    """
-    filter = ""
-    for key, value in params.items():
-        if value:
-            filter += f"{key.upper()} \"{value}\" "
-    
-    if filter:
-        return f"({filter.rstrip()})"
-    else:
-        return "(ALL)"
-
-def unpack_email(msgs):
-    """
-    Create a list with the message or messages (multipart)
-    """
-    result = []
-    if msgs.is_multipart():
-        result.append(msgs)
-        for msg in msgs.get_payload():
-            #if isinstance(msg, (list, tuple)):
-            if hasattr(msg, "__iter__") and not isinstance(msg, str):
-                result.extend(unpack_email(msg))
-            else:
-                result.append(msg)
-    else:
-        result.append(msgs)
-    return result        
-
 class Mailbox:
     def __init__(self, id: int, config:dict) -> None:
         self.id = id
@@ -89,4 +58,32 @@ class Mailbox:
                             else:
                                 yield num.decode(), msgs, msg_payload.decode()
 
+def filter_builder(params):
+    """
+    Build a text filter based on configuration filter
+    """
+    filter = ""
+    for key, value in params.items():
+        if value:
+            filter += f"{key.upper()} \"{value}\" "
+    
+    if filter:
+        return f"({filter.rstrip()})"
+    else:
+        return "(ALL)"                                
 
+"""
+def unpack_email(msgs):
+    result = []
+    if msgs.is_multipart():
+        result.append(msgs)
+        for msg in msgs.get_payload():
+            #if isinstance(msg, (list, tuple)):
+            if hasattr(msg, "__iter__") and not isinstance(msg, str):
+                result.extend(unpack_email(msg))
+            else:
+                result.append(msg)
+    else:
+        result.append(msgs)
+    return result
+"""

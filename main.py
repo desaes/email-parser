@@ -7,6 +7,7 @@ import itertools
 import json
 from functools import partial
 import pprint
+from libraries.action import Action
 
 from libraries.config import Config
 from libraries.mailbox import Mailbox
@@ -16,13 +17,6 @@ PROCS_BY_CORE = 2
 
 def validate_yaml_structure():
     pass
-
-
-#def parse(a: str, b: str):
-def parse(mailbox: Mailbox, config):
-    with open('/tmp/log.txt', 'a') as fd:
-        fd.write(f"mailbox: {mailbox.id}\n")
-        fd.write(f"config: {config}\n")        
 
 def main():
     #while True:
@@ -36,9 +30,10 @@ def main():
             ):
             for email_id, part, email_body in mailbox.read_email():
                 parser = Parser(config_data['parser'][mailbox.id], part, email_body)
-                result = parser.parse()
-                if len(result) > 0:
-                    print(result)
+                parse_result = parser.parse()
+                if len(parse_result) > 0:
+                    action = Action(mailbox.id, parse_result)
+                    action.run()
 
 
         
