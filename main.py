@@ -32,6 +32,7 @@ def main():
                 parser = Parser(config_data['parser'][mailbox.id], part, email_body)
                 parse_result = parser.parse()
                 if len(parse_result) > 0:
+                    
                     action = Action(mailbox.id, parse_result)
                     action.run()
 

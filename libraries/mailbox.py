@@ -6,6 +6,7 @@ import libraries.logger
 import libraries.util
 
 class Mailbox:
+    
     def __init__(self, id: int, config:dict) -> None:
         self.id = id
         self.config = config

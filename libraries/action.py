@@ -2,7 +2,7 @@ from pypyr import pipelinerunner
 import os
 
 class Action:
-    def __init__(self, id: str, parameters: dict ) -> None:
+    def __init__(self, id: str,  parameters: dict ) -> None:
         self.id = id
         self.parameters = parameters
 
