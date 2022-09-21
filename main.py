@@ -1,46 +1,27 @@
-import daemon
 import time
 import os
-from concurrent import futures
-import multiprocessing
-import itertools
-import json
 from functools import partial
-import pprint
-from libraries.action import Action
+from src.classes.action import Action
+from src.classes.mailbox import Mailbox
+from src.classes.parser import Parser
+from src.classes.logger import custom_log
+import hydra
 
-from libraries.config import Config
-from libraries.mailbox import Mailbox
-from libraries.parser import Parser
+@hydra.main(config_path="conf", version_base=None)
+def main(cfg):
 
-PROCS_BY_CORE = 2
+    mailbox = Mailbox(cfg.e_mail)
+    for email_uid, part, email_body in mailbox.read_email():
+        parser = Parser(cfg.parser, part, email_body)
+        parse_result = parser.parse()
+        if len(parse_result) > 0:
+            action = Action(pipeline=cfg.action, args=parse_result, model=cfg.model)
+            response_code, response_text = action.run()
+            if response_code == 0:
+                custom_log(f'E-mail successfully processed: {response_text}', 'green')
+                mailbox.move_email(email_uid)
+            break
+    mailbox.disconnect()
 
-def validate_yaml_structure():
-    pass
-
-def main():
-    #while True:
-        config = Config(os.getcwd() + '/configs/')
-        config_data = config.get_config()
-       
-        for mailbox in (
-            Mailbox(id=item[0], config=item[1]) 
-            for item in config_data['mailbox'].items() 
-            if item[1]['Mailbox']['Enabled']
-            ):
-            for email_id, part, email_body in mailbox.read_email():
-                parser = Parser(config_data['parser'][mailbox.id], part, email_body)
-                parse_result = parser.parse()
-                if len(parse_result) > 0:
-                    
-                    action = Action(mailbox.id, parse_result)
-                    action.run()
-
-
-        
-        
-        #time.sleep(1)
-
-#with daemon.DaemonContext():
 if __name__ == '__main__':
     main()

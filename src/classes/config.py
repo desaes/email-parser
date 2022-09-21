@@ -1,4 +1,4 @@
-from libraries.errors import *
+from src.classes.errors import *
 from hydra import compose, initialize
 import glob
 class Config:

@@ -2,3 +2,4 @@
 **/venv
 **/nogit
 **/__pycache__
+outputs/*

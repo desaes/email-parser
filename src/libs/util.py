@@ -16,3 +16,17 @@ def is_html(data: str) -> bool:
 
 def plain_str(data: str) -> str:
     return "".join([s for s in data.replace('\r\n','').replace('\n','').splitlines(True) if s.strip()])
+
+def filter_builder(params):
+    """
+    Build a text filter based on configuration filter
+    """
+    filter = ""
+    for key, value in params.items():
+        if value:
+            filter += f"{key.upper()} \"{value}\" "
+    
+    if filter:
+        return f"({filter.rstrip()})"
+    else:
+        return "(ALL)"
