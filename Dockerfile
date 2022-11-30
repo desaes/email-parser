@@ -15,4 +15,4 @@ COPY ./app /app
 
 WORKDIR /app
 
-CMD ["sh", "-c", "python main.py -c conf/config.yaml -n ${EMAIL_NUMBER}"]
+CMD ["sh", "-c", "python main.py -c config/config.yaml -n ${EMAIL_NUMBER}"]
