@@ -5,6 +5,7 @@ import src.classes.logger
 import src.libs.util
 from src.libs.util import filter_builder
 import re
+import os
 
 
 class Mailbox:
@@ -22,12 +23,18 @@ class Mailbox:
         return self.__auth
 
     def auth(self, params) -> None:
+            """
             src.classes.logger.custom_log(f"Trying to authenticate: {self.config['mail_box']['imap_user']}", 'yellow')
             result, _ = self.imap.login(self.config['mail_box']['imap_user'], self.config['mail_box']['imap_pass'])
+            src.classes.logger.custom_log(f"Trying to authenticate: {os.getenv('IMAP_USER')}", 'yellow')
+            """
+            result, _ = self.imap.login(os.getenv('IMAP_USERNAME'), os.getenv('IMAP_PASSWORD'))
             if result != 'OK':
                 raise Exception(f"Error connecting to mail_box: {self.config['mail_box']['imap_user']}")
             else:
+                """
                 src.classes.logger.custom_log(f"Successfully autheticated: {self.config['mail_box']['imap_user']}", 'green')
+                """
                 self.__auth = True
 
     def disconnect(self) -> None:

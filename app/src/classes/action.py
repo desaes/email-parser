@@ -1,13 +1,12 @@
 from importlib.util import module_for_loader
 from pypyr import pipelinerunner
 import json
-import omegaconf
 
 class Action:
-    def __init__(self, pipeline: omegaconf.dictconfig.DictConfig, args: dict, model: dict) -> None:
-        self.__pipeline = json.dumps(omegaconf.OmegaConf.to_container(pipeline))
+    def __init__(self, pipeline: dict, args: dict, model: dict) -> None:
+        self.__pipeline = json.dumps(pipeline)
         self.__args = args
-        self.__args['model'] = omegaconf.OmegaConf.to_container(model)
+        self.__args['model'] = model
 
     def run(self):
         context = pipelinerunner.run(

@@ -1,5 +1,6 @@
 **/*.yaml
-**/venv
+**/.venv
 **/nogit
-**/__pycache__
-outputs/*
+**__pycache__
+**/app/outputs
+**/app/conf
