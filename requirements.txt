@@ -1,9 +1,13 @@
 antlr4-python3-runtime==4.9.3
 certifi==2022.9.24
+cffi==1.15.1
 charset-normalizer==2.1.1
 colorama==0.4.6
+cryptography==38.0.4
 idna==3.4
 lxml==4.9.1
+pycparser==2.21
+pyOpenSSL==22.1.0
 pypyr==5.7.1
 python-dateutil==2.8.2
 PyYAML==6.0
