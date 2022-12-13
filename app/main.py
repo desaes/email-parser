@@ -15,19 +15,27 @@ def main(config_file, email_number):
 
     mailbox = Mailbox(cfg['e_mail'])
     i = 0
-    for email_uid, part, email_body in mailbox.read_email():
-        if i >= int(email_number):
-            break
-        parser = Parser(cfg['parser'], part, email_body)
-        parse_result = parser.parse()
+    try:
+        for email_uid, part, email_body in mailbox.read_email():
+            parser = Parser(cfg['parser'], part, email_body)
+            parse_result = parser.parse()
 
-        if len(parse_result) > 0:
-            action = Action(pipeline=cfg['action'], args=parse_result, model=cfg['model'])
-            response_code, response_text = action.run()
-            if response_code == 0:
-                custom_log(f'E-mail successfully processed: {response_text}', 'green')
-                mailbox.move_email(email_uid)
-        i = i + 1
+            if len(parse_result) > 0:
+                action = Action(pipeline=cfg['action'], args=parse_result, model=cfg['model'])
+                try:
+                    response_code, response_text = action.run()
+                    if response_code == 0:
+                        custom_log(f'E-mail successfully processed: {response_text}', 'green')
+                        mailbox.move_email(email_uid)
+                    else:
+                        custom_log(f'Error processing email: {response_text}. Moving to next one.', 'red')
+                except Exception as e:
+                    custom_log(f'Error processing email: {e}. Moving to next one.', 'yellow')
+            i = i + 1
+            if i >= int(email_number):
+                break
+    except Exception as e:
+        custom_log(f'Error reading e-mail: {e}', 'red')
     mailbox.disconnect()
 
 

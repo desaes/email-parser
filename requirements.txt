@@ -4,6 +4,7 @@ cffi==1.15.1
 charset-normalizer==2.1.1
 colorama==0.4.6
 cryptography==38.0.4
+html2text==2020.1.16
 idna==3.4
 lxml==4.9.1
 pycparser==2.21

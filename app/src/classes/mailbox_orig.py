@@ -41,12 +41,12 @@ class Mailbox:
         if self:
             self.imap.logout()
 
-    def move_email(self, id: int, folder='processed') -> None:
-        result = self.imap.uid('MOVE', str(id).encode(), folder)
+    def move_email(self, id: int) -> None:
+        result = self.imap.uid('MOVE', str(id).encode(), 'processed')
         if result[0] != 'OK':
-            raise Exception(f"Error moving e-mail to {folder} folder")
+            raise Exception(f"Error moving e-mail to processed folder")
 
-    def read_email(self) -> str:
+    def read_email(self, move=False) -> str:
         result, data = self.imap.select(self.config['mail_box']['imap_input_mbox'])
         if result != 'OK':
             raise Exception(f"Error opening folder {self.config['mail_box']['imap_input_mbox']}")
@@ -69,7 +69,6 @@ class Mailbox:
             msgs = email.message_from_bytes(data[0][1], policy=email.policy.default)
             #libraries.logger.custom_log(type(msgs), 'blue')
             #for msg in unpack_email(msgs):
-            body = ""
             for part in msgs.walk():
                 #libraries.logger.custom_log(f'Content_type: {part.get_content_maintype()}', 'cyan')
                 if part.get_content_maintype() == 'multipart':
@@ -85,38 +84,29 @@ class Mailbox:
                         if msg_payload:
                             if charset:
                                 if content_type == "text/plain":
-                                    body = body + "TXT Part\n\n"
-                                    body = body + msg_payload.decode(charset)
+                                    yield uid, msgs, msg_payload.decode(charset)
                                 elif content_type == "text/html":
-                                    body = body + "H2T Part\n\n"
-                                    body = body + html2text.html2text(msg_payload.decode(charset))
+                                    yield uid, msgs, html2text.html2text(msg_payload.decode(charset))
                             else:
                                 try:
                                     if content_type == "text/plain":
-                                        body = body + "TXT Part\n\n"
-                                        body = body + msg_payload.decode()
+                                        yield uid, msgs, msg_payload.decode()
                                     elif content_type == "text/html":
-                                        body = body + "H2T Part\n\n"
-                                        body = body + html2text.html2text(msg_payload.decode())
+                                        yield uid, msgs, html2text.html2text(msg_payload.decode(charset))
                                 except Exception as e:
                                     src.classes.logger.custom_log(f"Error trying to decode message using utf-8: {e}", 'red')
                                     src.classes.logger.custom_log(f"Trying to decode message using iso8859-1", 'yellow')
                                     try:
                                         if content_type == "text/plain":
-                                            body = body + "TXT Part\n\n"
-                                            body = body + msg_payload.decode("iso8859-1")
+                                            yield uid, msgs, msg_payload.decode("iso8859-1")
                                         elif content_type == "text/html":
-                                            body = body + "H2T Part\n\n"
-                                            body = body + html2text.html2text(msg_payload.decode("iso8859-1"))
+                                            yield uid, msgs, html2text.html2text(msg_payload.decode("iso8859-1"))
                                     except Exception as e:
                                         src.classes.logger.custom_log(f"Error trying to decode message using iso8859-1: {e}", 'red')
                                         if content_type == "text/plain":
-                                            body = body + "TXT Part\n\n"
-                                            body = body + msg_payload
+                                            yield uid, msgs, msg_payload
                                         elif content_type == "text/html":
-                                            body = body + "H2T Part\n\n"
-                                            body = body + html2text.html2text(msg_payload)
-            yield uid, msgs, body
+                                            yield uid, msgs, html2text.html2text(msg_payload)
 
 
 
