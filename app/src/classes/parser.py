@@ -22,6 +22,7 @@ class Parser:
                             result = re.search(search_exp, self.email_as_dict[item])
                             if result:
                                 if result.group(1):
+                                    print(result.group(1))
                                     data[field.split(',')[1]] = result.group(1)
                             if search_exp == "(.+)" and item == "body":
                                 data[field.split(',')[1]] = self.email_as_dict[item]

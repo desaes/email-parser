@@ -19,7 +19,6 @@ def main(config_file, email_number):
         for email_uid, part, email_body in mailbox.read_email():
             parser = Parser(cfg['parser'], part, email_body)
             parse_result = parser.parse()
-
             if len(parse_result) > 0:
                 action = Action(pipeline=cfg['action'], args=parse_result, model=cfg['model'])
                 try:
@@ -28,9 +27,9 @@ def main(config_file, email_number):
                         custom_log(f'E-mail successfully processed: {response_text}', 'green')
                         mailbox.move_email(email_uid)
                     else:
-                        custom_log(f'Error processing email: {response_text}. Moving to next one.', 'red')
+                        custom_log(f'Skipping this: {response_text}. Moving to next one.', 'yellow')
                 except Exception as e:
-                    custom_log(f'Error processing email: {e}. Moving to next one.', 'yellow')
+                    custom_log(f'Error processing email: {e}. Moving to next one.', 'red')
             i = i + 1
             if i >= int(email_number):
                 break
